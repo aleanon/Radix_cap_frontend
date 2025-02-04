@@ -18,6 +18,10 @@ import { RouterLink, RouterView } from 'vue-router'
     <main>
         <RouterView />
     </main>
+
+    <footer>
+        <p>�� 2023 My Cryptocurrency App</p>
+    </footer>
 </template>
 
 <style scoped>
@@ -30,7 +34,11 @@ header {
 
 main {
     width: 100%;
-    overflow: auto;
     height: 100%;
+}
+
+footer {
+    height: 250px;
+    background-color: var(--color-background-soft);
 }
 </style>

@@ -1,12 +1,23 @@
 <template>
     <div id="table-wrapper">
-        <div class="free-space"></div>
+        <!-- <div class="free-space"></div> -->
         <table>
+            <colgroup>
+                <col class="rank-col" />
+                <col class="coin-col" />
+                <col />
+                <col style="width: 84px; min-width: auto; max-width: auto" />
+                <col style="width: 84px; min-width: auto; max-width: auto" />
+                <col style="width: 84px; min-width: auto; max-width: auto" />
+                <col style="width: 200px; min-width: auto; max-width: auto" />
+                <col style="width: 200px; min-width: auto; max-width: auto" />
+                <col style="width: 200px; min-width: auto; max-width: auto" />
+                <col />
+            </colgroup>
             <thead>
                 <tr>
                     <th class="rank-col">Rank</th>
                     <th class="coin-col">Coin</th>
-                    <th>Ticker</th>
                     <th>Price</th>
                     <th>1H</th>
                     <th>24H</th>
@@ -18,14 +29,16 @@
             </thead>
             <tbody>
                 <tr v-for="currency in currencies" :key="currency.id">
-                    <td class="rank-col">{{ currency.market_cap_rank }}</td>
-                    <td class="coin-col">
+                    <td class="rank-cell">{{ currency.market_cap_rank }}</td>
+                    <td class="coin-cell">
                         <div class="coin-icon">
-                            <img :src="currency.image" :alt="currency.name" width="20" />
+                            <img :src="currency.image" :alt="currency.name" width="30" />
                         </div>
-                        <div class="coin-name">{{ currency.name }}</div>
+                        <div class="name-ticker-wrapper">
+                            <div class="coin-name">{{ currency.name }}</div>
+                            <div class="ticker">{{ currency.symbol.toUpperCase() }}</div>
+                        </div>
                     </td>
-                    <td>{{ currency.symbol.toUpperCase() }}</td>
                     <td>${{ formatPrice(currency.current_price) }}</td>
                     <td :class="getPriceChangeColor(currency.price_change_24h)">
                         {{ formatPercentage(currency.price_change_percentage_24h) }}%
@@ -42,7 +55,7 @@
                 </tr>
             </tbody>
         </table>
-        <div class="free-space"></div>
+        <!-- <div class="free-space"></div> -->
     </div>
 </template>
 
@@ -62,13 +75,8 @@ const formatPrice = (price: number): string => {
 }
 
 const formatNumber = (num: number): string => {
-    if (num >= 1e9) {
-        return (num / 1e9).toFixed(2) + 'B'
-    }
-    if (num >= 1e6) {
-        return (num / 1e6).toFixed(2) + 'M'
-    }
-    return num.toLocaleString('en-US')
+    const floored = Math.floor(num)
+    return floored.toLocaleString()
 }
 
 const formatPercentage = (num: number | null): string => {
@@ -107,45 +115,91 @@ fetchCurrenciesForCurrentPage()
 #table-wrapper {
     width: 100%;
     height: 100%;
-    display: flex;
+    display: block;
+    overflow-x: auto hidden;
+    max-width: 1600px;
+    min-width: 1300px;
 }
 
 table {
+    display: table;
     border-spacing: 0;
-    width: 80%;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+tbody tr {
+    cursor: pointer;
+}
+
+col {
+    display: table-column;
+    unicode-bidi: isolate;
+}
+
+.rank-col {
+    width: 50px;
+    min-width: auto;
+    max-width: auto;
+}
+
+.coin-col {
+    width: 250px;
+    min-width: auto;
+    max-width: auto;
 }
 
 th,
 td {
     text-align: right;
     justify-items: center;
-    width: auto;
+    font-size: 0.9em;
+    color: azure;
+    font-weight: 500;
+}
+
+td {
+    display: table-cell;
+    vertical-align: inherit;
+    unicode-bidi: isolate;
 }
 
 tr {
     height: 80px;
+    border-bottom: 1px solid white;
+}
+
+tr:hover .coin-cell,
+tr:hover td[style*='position: sticky'] {
+    background-color: var(--color-background-hover);
 }
 
 tr:hover {
-    background-color: var(--vt-c-divider-dark-1);
+    background-color: var(--color-background-hover);
 }
 
-.rank-col,
-.coin-col {
+.rank-cell,
+.coin-cell {
     text-align: left;
 }
 
-.rank-col {
+.rank-cell {
     width: 15px;
+    text-align: center;
 }
 
-.coin-col {
+.coin-cell {
     display: flex;
     height: inherit;
-    gap: 10px;
+    position: sticky;
+    gap: 15px;
     align-items: center;
     text-wrap-mode: wrap;
-    width: 150px;
+    width: auto;
+    left: 0;
+    padding-left: 15px;
+    background-color: var(--color-background);
+    z-index: 1;
 }
 
 .coin-icon {
@@ -153,10 +207,49 @@ tr:hover {
     align-items: center;
 }
 
-.coin-col {
+.name-ticker-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 15px;
 }
 
-.free-space {
-    flex-grow: 1;
+@media (max-width: 1024px) {
+    .name-ticker-wrapper {
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .coin-col {
+        min-width: 200px;
+        width: 200px;
+    }
 }
+
+.coin-name {
+    font-weight: 500;
+}
+
+.ticker {
+    font-size: 0.9em;
+    font-weight: 100;
+    width: 100%;
+}
+
+th.rank-col,
+th.coin-col {
+    z-index: 2;
+    /* background-color: var(--color-background); */
+}
+
+.negative-change {
+    color: var(--color-negative);
+}
+
+.positive-change {
+    color: var(--color-positive);
+}
+
+/* .free-space {
+    flex-grow: 1;
+} */
 </style>
