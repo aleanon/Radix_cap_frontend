@@ -12,6 +12,14 @@ export class Roi {
     }
 }
 
+export class SparklineInSevenDays {
+    price: number[]
+
+    constructor(price: number[]) {
+        this.price = price
+    }
+}
+
 export class Currency {
     id: string
     symbol: string
@@ -39,6 +47,7 @@ export class Currency {
     atl_date: string
     roi: Roi | null
     last_updated: string
+    sparkline_in_7d: SparklineInSevenDays
 
     constructor(
         id: string,
@@ -67,6 +76,7 @@ export class Currency {
         atl_date: string,
         roi: Roi | null,
         last_updated: string,
+        sparkline: SparklineInSevenDays = new SparklineInSevenDays([]),
     ) {
         this.id = id
         this.symbol = symbol
@@ -94,18 +104,16 @@ export class Currency {
         this.atl_date = atl_date
         this.roi = roi
         this.last_updated = last_updated
+        this.sparkline_in_7d = sparkline
     }
 }
 
 export const useCurrenciesStore = defineStore('currencies', {
     state: () => ({
-        active_page: 1,
+        active_cryptocurrencies: 0,
         coins: new Map<string, Currency>(),
     }),
     actions: {
-        setPage(page: number) {
-            this.active_page = page
-        },
         setCurrencies(currencies: Currency[]): void {
             try {
                 currencies.forEach((currency) => {
@@ -113,6 +121,25 @@ export const useCurrenciesStore = defineStore('currencies', {
                 })
             } catch (err) {
                 console.error('Error parsing JSON', err)
+            }
+        },
+        getCurrencies(start_rank: number, end_rank: number): Currency[] {
+            const currencies = []
+            for (const currency of this.coins.values()) {
+                if (currency.market_cap_rank < start_rank || currency.market_cap_rank > end_rank)
+                    continue
+
+                currencies.push(currency)
+            }
+            return currencies.sort((a, b) => (a.market_cap_rank, b.market_cap_rank))
+        },
+        async fetchActiveCurrencies() {
+            try {
+                const response = await fetch('https://api.coingecko.com/api/v3/global')
+                const data = await response.json()
+                this.active_cryptocurrencies = data.data.active_cryptocurrencies
+            } catch (err) {
+                console.error('Error fetching active cryptocurrencies', err)
             }
         },
     },

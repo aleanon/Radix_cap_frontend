@@ -7,10 +7,8 @@ import { RouterLink, RouterView } from 'vue-router'
         <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
 
         <div class="wrapper">
-            <HelloWorld msg="You did it!" />
-
             <nav>
-                <RouterLink to="/">Cryptocurrencies</RouterLink>
+                <RouterLink :to="`/coins/page/1`">Cryptocurrencies</RouterLink>
             </nav>
         </div>
     </header>
@@ -35,9 +33,11 @@ header {
 main {
     width: 100%;
     height: 100%;
+    overflow-x: hidden;
 }
 
 footer {
+    width: 100%;
     height: 250px;
     background-color: var(--color-background-soft);
 }
