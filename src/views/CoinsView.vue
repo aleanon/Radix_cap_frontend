@@ -2,20 +2,30 @@
     <div id="currency-table">
         <CurrencyTable></CurrencyTable>
     </div>
-    <div id="table-page-controls">
-        <div>
+    <!-- <div id="table-page-controls">
+        <div id="rank-info">
             <p>
-                Showing {{ computedValues.startRank }} to {{ computedValues.endRank }} of
-                {{ currencyStore.active_cryptocurrencies }}
+                <span class="hide">Showing </span>
+                <span class="hide-last">
+                    {{ computedValues.startRank }} to {{ computedValues.endRank }}
+                </span>
+                <span class="hide"> of {{ currencyStore.active_cryptocurrencies }}</span>
             </p>
         </div>
+        <div class="space"></div>
         <div id="table-page-nav">
             <button @click="previousPage()">˂</button>
             <div id="number-buttons">
                 <button
                     v-for="number in computedValues.pageNumbers"
                     :key="number"
-                    :class="Number(number) === computedValues.currentPage ? 'selected' : ''"
+                    :class="
+                        Number(number) === computedValues.currentPage
+                            ? 'selected'
+                            : isNaN(Number(number))
+                              ? 'elipse'
+                              : 'not-selected'
+                    "
                     @click="goToPage(number)"
                 >
                     {{ number }}
@@ -23,100 +33,108 @@
             </div>
             <button @click="nextPage()">˃</button>
         </div>
-        <div id="row-amount-selector">
-            <!-- <select v-model="rowSelection">
-                <option value="25">25</option>
-                <option value="50">50</option>
-                <option value="100">100</option>
-                <option value="200">200</option>
-            </select> -->
+        <div class="space"></div>
+        <div id="selector-wrapper">
+            <label for="row-selector">Rows</label>
+            <select id="row-selector" v-model="options">
+                <option v-for="option in options" :key="option.value" :value="option.value">
+                    {{ option.label }}
+                </option>
+            </select>
         </div>
-    </div>
+    </div> -->
 </template>
 
 <script setup lang="ts">
 import CurrencyTable from '@/components/CurrencyTable.vue'
-import { useCurrenciesStore } from '@/stores/currencies'
-import { useCurrencyTable } from '@/stores/currencyTable'
-import { computed, watch } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+// import { useCurrenciesStore } from '@/stores/currencies'
+// import { useCurrencyTable } from '@/stores/currencyTable'
+// import { computed, watch } from 'vue'
+// import { useRouter, useRoute } from 'vue-router'
 
-const router = useRouter()
-const route = useRoute()
-const tableState = useCurrencyTable()
-const currencyStore = useCurrenciesStore()
+// const router = useRouter()
+// const route = useRoute()
+// const tableState = useCurrencyTable()
+// const currencyStore = useCurrenciesStore()
 
-const previousPage = () => {
-    tableState.setPage(tableState.activePage - 1, router)
-}
-const nextPage = () => {
-    tableState.setPage(tableState.activePage + 1, router)
-}
-const goToPage = (page: string) => {
-    const num = Number(page)
-    if (num == Number.NaN) return
-    tableState.setPage(num, router)
-}
+// const previousPage = () => {
+//     tableState.setPage(tableState.activePage - 1, router)
+// }
+// const nextPage = () => {
+//     tableState.setPage(tableState.activePage + 1, router)
+// }
+// const goToPage = (page: string) => {
+//     const num = Number(page)
+//     if (isNaN(num)) return
+//     tableState.setPage(num, router)
+// }
 
-const computedValues = computed(() => {
-    const currentPage = Number(router.currentRoute.value.params.pageNumber)
-    const nrOfPages = Math.floor(currencyStore.active_cryptocurrencies / 100)
-    const startRank = (currentPage - 1) * tableState.nrOfCurrenciesPerPage + 1
-    const endRank = startRank + tableState.nrOfCurrenciesPerPage - 1
+// const options = [
+//     { value: '25', label: '25' },
+//     { value: '50', label: '50' },
+//     { value: '100', label: '100' },
+//     { value: '200', label: '200' },
+// ]
 
-    if (nrOfPages <= 9) {
-        return {
-            currentPage: currentPage,
-            nrOfPages: nrOfPages,
-            pageNumbers: Array.from({ length: nrOfPages }, (_, i) => (i + 1).toString()),
-        }
-    }
+// const computedValues = computed(() => {
+//     const currentPage = Number(router.currentRoute.value.params.pageNumber)
+//     const nrOfPages = Math.floor(currencyStore.active_cryptocurrencies / 100)
+//     const startRank = (currentPage - 1) * tableState.nrOfCurrenciesPerPage + 1
+//     const endRank = startRank + tableState.nrOfCurrenciesPerPage - 1
 
-    const pages: string[] = []
-    const addEllipsis = () => pages.push('...')
-    const addPage = (pageNum: number) => pages.push(pageNum.toString())
+//     if (nrOfPages <= 9) {
+//         return {
+//             currentPage: currentPage,
+//             nrOfPages: nrOfPages,
+//             pageNumbers: Array.from({ length: nrOfPages }, (_, i) => (i + 1).toString()),
+//         }
+//     }
 
-    addPage(1)
+//     const pages: string[] = []
+//     const addEllipsis = () => pages.push('...')
+//     const addPage = (pageNum: number) => pages.push(pageNum.toString())
 
-    if (currentPage <= 4) {
-        for (let i = 2; i <= 7; i++) {
-            addPage(i)
-        }
-        addEllipsis()
-    } else if (currentPage >= nrOfPages - 3) {
-        addEllipsis()
-        for (let i = nrOfPages - 6; i < nrOfPages; i++) {
-            addPage(i)
-        }
-    } else {
-        addEllipsis()
-        for (let i = currentPage - 2; i <= currentPage + 2; i++) {
-            addPage(i)
-        }
-        addEllipsis()
-    }
+//     addPage(1)
 
-    addPage(nrOfPages)
+//     if (currentPage <= 4) {
+//         for (let i = 2; i <= 7; i++) {
+//             addPage(i)
+//         }
+//         addEllipsis()
+//     } else if (currentPage >= nrOfPages - 3) {
+//         addEllipsis()
+//         for (let i = nrOfPages - 6; i < nrOfPages; i++) {
+//             addPage(i)
+//         }
+//     } else {
+//         addEllipsis()
+//         for (let i = currentPage - 2; i <= currentPage + 2; i++) {
+//             addPage(i)
+//         }
+//         addEllipsis()
+//     }
 
-    return {
-        nrOfPages: nrOfPages,
-        currentPage: currentPage,
-        pageNumbers: pages,
-        startRank: startRank,
-        endRank: endRank,
-    }
-})
+//     addPage(nrOfPages)
 
-watch(
-    () => route.params.pageNumber,
-    (newPage) => {
-        const pageNum = Number(newPage)
-        if (!isNaN(pageNum) && pageNum !== tableState.activePage) {
-            tableState.activePage = pageNum
-        }
-    },
-    { immediate: true },
-)
+//     return {
+//         nrOfPages: nrOfPages,
+//         currentPage: currentPage,
+//         pageNumbers: pages,
+//         startRank: startRank,
+//         endRank: endRank,
+//     }
+// })
+
+// watch(
+//     () => route.params.pageNumber,
+//     (newPage) => {
+//         const pageNum = Number(newPage)
+//         if (!isNaN(pageNum) && pageNum !== tableState.activePage) {
+//             tableState.activePage = pageNum
+//         }
+//     },
+//     { immediate: true },
+// )
 </script>
 
 <style scoped>
@@ -130,15 +148,28 @@ watch(
     align-content: center;
 }
 
-#table-page-controls {
+/* #table-page-controls {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 30px 20px;
+    overflow-x: auto;
+}
+
+#table-page-controls::-webkit-scrollbar {
+    display: none;
+}
+
+#rank-info {
+    width: auto;
+}
+
+.space {
+    width: auto;
 }
 
 #table-page-nav {
-    width: 30%;
+    width: auto;
     display: flex;
     justify-content: space-between;
 }
@@ -161,11 +192,56 @@ button {
     font-weight: 600;
 }
 
-button:hover {
+.elipse {
+    cursor: text;
+}
+
+.not-selected:hover {
     background-color: var(--color-background-hover);
 }
 
 .selected {
     background-color: var(--color-background-selected);
+    cursor: default;
 }
+
+#selector-wrapper {
+    display: flex;
+    gap: 5px;
+}
+
+@media (max-width: 1024px) {
+    .not-selected:first-child {
+        display: none;
+    }
+
+    .not-selected:last-child {
+        display: None;
+    }
+
+    .elipse {
+        display: none;
+    }
+
+    .hide {
+        display: none;
+    }
+}
+
+@media (max-width: 800px) {
+    .hide-last {
+        display: none;
+    }
+
+    .space {
+        display: none;
+    }
+
+    .not-selected:nth-child(2) {
+        display: none;
+    }
+    .not-selected:nth-last-child(3) {
+        display: none;
+    }
+} */
 </style>

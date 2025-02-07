@@ -4,7 +4,7 @@ import type { Router } from 'vue-router'
 export const useCurrencyTable = defineStore('tableState', {
     state: () => ({
         activePage: 1,
-        nrOfCurrenciesPerPage: 100,
+        rowsPrPage: 100,
     }),
     actions: {
         setPage(page: number, router: Router) {
@@ -12,8 +12,12 @@ export const useCurrencyTable = defineStore('tableState', {
             this.activePage = page
             router.push(`/coins/page/${page}`)
         },
-        setNrOfCurrenciesPerPage(nrOfCurrencies: number) {
-            this.nrOfCurrenciesPerPage = nrOfCurrencies
+        setRowsPerPage(nrOfCurrencies: number, router: Router) {
+            this.rowsPrPage = nrOfCurrencies
+            this.setPage(1, router)
+        },
+        getRowsPerPage(): string {
+            return String(this.rowsPrPage)
         },
     },
 })

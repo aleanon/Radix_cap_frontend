@@ -56,20 +56,22 @@
                 </tbody>
             </table>
         </div>
+        <TablePageControl></TablePageControl>
     </div>
 </template>
 
 <script setup lang="ts">
 import { Currency, useCurrenciesStore } from '@/stores/currencies'
 import { computed, watch } from 'vue'
-import CoinCell from '@/components/CoinCell.vue'
-import NonInteractiveChart from './NonInteractiveChart.vue'
+import CoinCell from '@/components/currency_table/CoinCell.vue'
+import NonInteractiveChart from './currency_table/NonInteractiveChart.vue'
 import { useCurrencyTable } from '@/stores/currencyTable'
+import TablePageControl from './currency_table/TablePageControl.vue'
 
 const currenciesStore = useCurrenciesStore()
 const currencies = computed(() => {
-    const startRank = (tableState.activePage - 1) * tableState.nrOfCurrenciesPerPage + 1
-    const endRank = tableState.activePage * tableState.nrOfCurrenciesPerPage
+    const startRank = (tableState.activePage - 1) * tableState.rowsPrPage + 1
+    const endRank = tableState.activePage * tableState.rowsPrPage
     return currenciesStore.getCurrencies(startRank, endRank)
 })
 
@@ -101,7 +103,7 @@ const getPriceChangeColor = (change: number | null): string => {
 const fetchCurrenciesForCurrentPage = async () => {
     try {
         const response = await fetch(
-            `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=${active_page.value}&sparkline=true`,
+            `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=${tableState.rowsPrPage}&page=${active_page.value}&sparkline=true`,
         )
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`)
