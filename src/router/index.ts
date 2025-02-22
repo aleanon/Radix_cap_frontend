@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import CoinsView from '../views/CoinsView.vue'
+import CoinDetailsView from '@/views/CoinDetailsView.vue'
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -12,6 +13,11 @@ const router = createRouter({
             path: '/coins/page/:pageNumber',
             name: 'coinsPage',
             component: CoinsView,
+        },
+        {
+            path: '/coin/:coinId',
+            name: 'coinDetails',
+            component: CoinDetailsView,
         },
     ],
 })

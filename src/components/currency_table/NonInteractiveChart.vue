@@ -34,9 +34,13 @@ const positiveChange = computed(() => {
 })
 
 const paths = computed(() => {
+    if (!props.data || props.data.length < 2) {
+        return { linePath: '', areaPath: '' }
+    }
+
     const minValue = Math.min(...props.data)
     const maxValue = Math.max(...props.data)
-    const valueRange = maxValue - minValue
+    const valueRange = maxValue - minValue || 1
 
     const padding = 5
     const points = props.data.map((value, index) => {
@@ -47,6 +51,10 @@ const paths = computed(() => {
             ((value - minValue) / valueRange) * (props.height - padding * 2)
         return { x, y }
     })
+
+    if (points.length === 0) {
+        return { linePath: '', areaPath: '' }
+    }
 
     const linePath = points.reduce(
         (path, point, i) =>

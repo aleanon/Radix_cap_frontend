@@ -6,8 +6,14 @@ import { createPinia } from 'pinia'
 import App from './App.vue'
 import router from './router'
 import { useCurrenciesStore } from './stores/currencies'
+import { faCaretUp, faCaretDown } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { library } from '@fortawesome/fontawesome-svg-core'
+
+library.add(faCaretUp, faCaretDown)
 
 const app = createApp(App)
+app.component('font-awesome-icon', FontAwesomeIcon)
 
 app.use(createPinia())
 

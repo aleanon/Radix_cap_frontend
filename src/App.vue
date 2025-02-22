@@ -1,7 +1,3 @@
-<script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
-</script>
-
 <template>
     <header>
         <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
@@ -22,18 +18,29 @@ import { RouterLink, RouterView } from 'vue-router'
     </footer>
 </template>
 
+<script setup lang="ts">
+import { RouterLink, RouterView } from 'vue-router'
+import { onMounted } from 'vue'
+import { useCurrenciesStore } from './stores/currencies'
+
+const currencies = useCurrenciesStore()
+
+onMounted(async () => {
+    currencies.fetchAllCurrencies()
+})
+</script>
 <style scoped>
 header {
     display: flex;
     align-items: center;
     line-height: 1.5;
-    max-height: 100vh;
+    height: 15vh;
 }
 
 main {
     width: 100%;
-    height: 100%;
-    overflow-x: hidden;
+    min-height: 85vh;
+    overflow-y: auto;
 }
 
 footer {

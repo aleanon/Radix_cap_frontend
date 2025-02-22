@@ -11,13 +11,13 @@
 </template>
 
 <script setup lang="ts">
-interface CoinCellProps {
+interface Props {
     image: string
     name: string
     symbol: string
 }
 
-const props = defineProps<CoinCellProps>()
+const props = defineProps<Props>()
 </script>
 
 <style scoped>

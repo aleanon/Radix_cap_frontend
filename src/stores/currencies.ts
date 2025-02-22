@@ -115,13 +115,10 @@ export const useCurrenciesStore = defineStore('currencies', {
     }),
     actions: {
         setCurrencies(currencies: Currency[]): void {
-            try {
-                currencies.forEach((currency) => {
-                    this.coins.set(currency.id, currency)
-                })
-            } catch (err) {
-                console.error('Error parsing JSON', err)
-            }
+            currencies.forEach((currency) => {
+                this.coins.set(currency.id, currency)
+            })
+            this.active_cryptocurrencies = this.coins.size
         },
         getCurrencies(start_rank: number, end_rank: number): Currency[] {
             const currencies = []
@@ -131,7 +128,10 @@ export const useCurrenciesStore = defineStore('currencies', {
 
                 currencies.push(currency)
             }
-            return currencies.sort((a, b) => (a.market_cap_rank, b.market_cap_rank))
+            return currencies.sort((a, b) => a.market_cap_rank - b.market_cap_rank)
+        },
+        getCurrency(id: string): Currency | null {
+            return this.coins.get(id) ?? null
         },
         async fetchActiveCurrencies() {
             try {
@@ -140,6 +140,30 @@ export const useCurrenciesStore = defineStore('currencies', {
                 this.active_cryptocurrencies = data.data.active_cryptocurrencies
             } catch (err) {
                 console.error('Error fetching active cryptocurrencies', err)
+            }
+        },
+        async fetchAllCurrencies() {
+            try {
+                const response = await fetch('http://127.0.0.1:5000/AllCoins')
+                const data = await response.json()
+                this.setCurrencies(data)
+            } catch (err) {
+                console.error('Error fetching all cryptocurrencies', err)
+            }
+        },
+        async fetchCurrenciesForCurrentPage(activePage: number, rowsPrPage: number) {
+            try {
+                const response = await fetch(
+                    `http://127.0.0.1:5000/Coins/?page=${activePage}&assetPrPage=${rowsPrPage}`,
+                )
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`)
+                }
+                const data: Currency[] = await response.json()
+
+                this.setCurrencies(data)
+            } catch (error) {
+                console.error(`Error fetching cryptocurrencies for page ${activePage}:`, error)
             }
         },
     },

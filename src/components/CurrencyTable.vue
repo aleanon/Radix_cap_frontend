@@ -16,43 +16,23 @@
                 </colgroup>
                 <thead>
                     <tr>
-                        <th id="rank-th">#</th>
-                        <th id="coin-th">Coin</th>
-                        <th>Price</th>
-                        <th>1H</th>
-                        <th>24H</th>
-                        <th>7D</th>
-                        <th>24H Volume</th>
-                        <th>Marketcap</th>
-                        <th>Last 7 Days</th>
+                        <th class="sticky-top" id="rank-th">#</th>
+                        <th class="sticky-top" id="coin-th">Coin</th>
+                        <th class="sticky-top">Price</th>
+                        <th class="sticky-top">1H</th>
+                        <th class="sticky-top">24H</th>
+                        <th class="sticky-top">7D</th>
+                        <th class="sticky-top">24H Volume</th>
+                        <th class="sticky-top">Marketcap</th>
+                        <th class="sticky-top">Last 7 Days</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="currency in currencies" :key="currency.id">
-                        <td class="rank-cell">{{ currency.market_cap_rank }}</td>
-                        <td class="coin-cell-td">
-                            <CoinCell
-                                :image="currency.image"
-                                :name="currency.name"
-                                :symbol="currency.symbol"
-                            />
-                        </td>
-                        <td>${{ formatPrice(currency.current_price) }}</td>
-                        <td :class="getPriceChangeColor(currency.price_change_24h)">
-                            {{ formatPercentage(currency.price_change_percentage_24h) }}%
-                        </td>
-                        <td :class="getPriceChangeColor(currency.price_change_24h)">
-                            {{ formatPercentage(currency.price_change_percentage_24h) }}%
-                        </td>
-                        <td :class="getPriceChangeColor(currency.price_change_24h)">
-                            {{ formatPercentage(currency.price_change_percentage_24h) }}%
-                        </td>
-                        <td>${{ formatNumber(currency.total_volume) }}</td>
-                        <td>${{ formatNumber(currency.market_cap) }}</td>
-                        <td>
-                            <NonInteractiveChart :data="currency.sparkline_in_7d.price" />
-                        </td>
-                    </tr>
+                    <CoinRow
+                        v-for="currency in currencies"
+                        :key="currency.id"
+                        :currency="currency"
+                    ></CoinRow>
                 </tbody>
             </table>
         </div>
@@ -61,12 +41,11 @@
 </template>
 
 <script setup lang="ts">
-import { Currency, useCurrenciesStore } from '@/stores/currencies'
-import { computed, watch } from 'vue'
-import CoinCell from '@/components/currency_table/CoinCell.vue'
-import NonInteractiveChart from './currency_table/NonInteractiveChart.vue'
+import { useCurrenciesStore } from '@/stores/currencies'
+import { computed, onMounted, watch } from 'vue'
 import { useCurrencyTable } from '@/stores/currencyTable'
 import TablePageControl from './currency_table/TablePageControl.vue'
+import CoinRow from './currency_table/CoinRow.vue'
 
 const currenciesStore = useCurrenciesStore()
 const currencies = computed(() => {
@@ -78,62 +57,31 @@ const currencies = computed(() => {
 const tableState = useCurrencyTable()
 const active_page = computed(() => tableState.activePage)
 
-const formatPrice = (price: number): string => {
-    return price.toLocaleString('en-US', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-    })
-}
-
-const formatNumber = (num: number): string => {
-    const floored = Math.floor(num)
-    return floored.toLocaleString()
-}
-
-const formatPercentage = (num: number | null): string => {
-    if (num === null) return '0.00'
-    return num.toFixed(2)
-}
-
-const getPriceChangeColor = (change: number | null): string => {
-    if (!change) return ''
-    return change > 0 ? 'positive-change' : 'negative-change'
-}
-
 const fetchCurrenciesForCurrentPage = async () => {
-    try {
-        const response = await fetch(
-            `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=${tableState.rowsPrPage}&page=${active_page.value}&sparkline=true`,
-        )
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`)
-        }
-        const data: Currency[] = await response.json()
-
-        currenciesStore.setCurrencies(data)
-    } catch (error) {
-        console.error(`Error fetching cryptocurrencies for page ${active_page.value}:`, error)
-    }
+    currenciesStore.fetchCurrenciesForCurrentPage(active_page.value, tableState.rowsPrPage)
 }
+
+onMounted(() => {
+    fetchCurrenciesForCurrentPage()
+})
 
 watch(active_page, () => {
     fetchCurrenciesForCurrentPage()
 })
-
-fetchCurrenciesForCurrentPage()
 </script>
 
 <style scoped>
 .container {
     width: 100%;
     max-width: 1400px;
-    overflow: hidden;
+    margin: 0 auto;
+    min-height: 100vh;
 }
 
 #table-wrapper {
     width: 100%;
+    min-height: 60%;
     overflow-x: auto;
-    overflow-y: visible;
 }
 
 #table-wrapper::-webkit-scrollbar {
@@ -144,13 +92,33 @@ table {
     display: table;
     border-spacing: 0;
     width: 100%;
+    height: 100%;
     min-width: 1200px;
     border-collapse: collapse;
-    position: relative;
 }
 
-tbody tr {
-    cursor: pointer;
+.sticky-top {
+    position: sticky;
+    top: 0;
+    background-color: var(--color-background);
+    z-index: 3;
+}
+
+thead {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+}
+
+thead th {
+    position: sticky;
+    top: 0;
+    background-color: var(--color-background);
+}
+
+tr {
+    height: 80px;
+    border-bottom: 1px solid white;
 }
 
 .rank-col {
@@ -173,8 +141,7 @@ tbody tr {
     text-align: left;
 }
 
-th,
-td {
+th {
     text-align: right;
     justify-items: center;
     font-size: 0.9em;
@@ -183,59 +150,18 @@ td {
     padding: 10px;
 }
 
-td {
-    display: table-cell;
-    vertical-align: inherit;
-    unicode-bidi: isolate;
-}
-
-tr {
-    height: 80px;
-    border-bottom: 1px solid white;
-}
-
-tbody tr:hover,
-tbody tr:hover .coin-cell-td,
-tbody tr:hover .rank-cell,
-tbody tr:hover td[style*='position: sticky'] {
-    background-color: var(--color-background-hover);
-}
-
-.coin-cell-td {
-    position: sticky;
-    left: 50px;
-    background-color: var(--color-background);
-    width: auto;
-    height: inherit;
-    z-index: 4;
-    height: 80px;
-}
-
-.rank-cell {
-    text-align: left;
-}
-
-.rank-cell {
-    width: 15px;
-    text-align: center;
-    position: sticky;
-    left: 0;
-    background-color: var(--color-background);
-    z-index: 2;
-}
-
 #rank-th {
     position: sticky;
     left: 0;
     background-color: var(--color-background);
-    z-index: 3;
+    z-index: 4;
 }
 
 #coin-th {
     position: sticky;
     left: 50px;
     background-color: var(--color-background);
-    z-index: 3;
+    z-index: 4;
 }
 
 @media (max-width: 1024px) {
@@ -248,13 +174,5 @@ tbody tr:hover td[style*='position: sticky'] {
 th.rank-col,
 th.coin-col {
     z-index: 2;
-}
-
-.negative-change {
-    color: var(--color-negative);
-}
-
-.positive-change {
-    color: var(--color-positive);
 }
 </style>
