@@ -64,14 +64,16 @@ const percentagePriceChange7D = computed(() => {
     return ((currentPrice - priceSevenDays) / currentPrice) * 100
 })
 
-const formatPrice = (price: number): string => {
+const formatPrice = (price: number | null): string => {
+    if (price === null) return '-'
     return price.toLocaleString('en-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
     })
 }
 
-const formatNumber = (num: number): string => {
+const formatNumber = (num: number | null): string => {
+    if (num === null) return '-'
     const floored = Math.floor(num)
     return floored.toLocaleString()
 }

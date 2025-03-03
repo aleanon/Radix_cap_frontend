@@ -73,7 +73,7 @@ watch(active_page, () => {
 <style scoped>
 .container {
     width: 100%;
-    max-width: 1400px;
+    /* max-width: 1400px; */
     margin: 0 auto;
     min-height: 100vh;
 }
@@ -102,18 +102,6 @@ table {
     top: 0;
     background-color: var(--color-background);
     z-index: 3;
-}
-
-thead {
-    position: sticky;
-    top: 0;
-    z-index: 3;
-}
-
-thead th {
-    position: sticky;
-    top: 0;
-    background-color: var(--color-background);
 }
 
 tr {

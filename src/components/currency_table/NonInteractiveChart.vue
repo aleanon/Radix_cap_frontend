@@ -42,7 +42,7 @@ const paths = computed(() => {
     const maxValue = Math.max(...props.data)
     const valueRange = maxValue - minValue || 1
 
-    const padding = 5
+    const padding = 0
     const points = props.data.map((value, index) => {
         const x = (index / (props.data.length - 1)) * props.width
         const y =

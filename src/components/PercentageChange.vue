@@ -1,6 +1,6 @@
 <template>
     <div :class="getPriceChangeColor(props.change)">
-        <font-awesome-icon v-if="!Number.isNaN(props.change)" :icon="caret(props.change)" />
+        <font-awesome-icon v-if="caret(props.change) != ''" :icon="caret(props.change)" />
         {{ formatPercentage(change) }}
     </div>
 </template>
@@ -15,12 +15,12 @@ const props = defineProps<Props>()
 const formatPercentage = (num: number | null): string => {
     if (num === null) return '0.00%'
     if (Number.isNaN(num)) return '-'
-    if (num < 0) return (num * -1).toFixed(2)
-    return num.toFixed(2) + '%'
+    if (num < 0) return `${(num * -1).toFixed(2)}%`
+    return `${num.toFixed(2)}%`
 }
 
 const caret = (num: number | null): string => {
-    if (!num) return ''
+    if (!num || Number.isNaN(num)) return ''
     return num >= 0 ? 'caret-up' : 'caret-down'
 }
 
@@ -32,6 +32,12 @@ const getPriceChangeColor = (change: number | null): string => {
 </script>
 
 <style scoped>
+div {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
 .negative-change {
     color: var(--color-negative);
 }

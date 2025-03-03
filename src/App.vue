@@ -1,27 +1,21 @@
 <template>
-    <header>
-        <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
+    <div id="site">
+        <SiteHeader id="header"></SiteHeader>
 
-        <div class="wrapper">
-            <nav>
-                <RouterLink :to="`/coins/page/1`">Cryptocurrencies</RouterLink>
-            </nav>
-        </div>
-    </header>
-
-    <main>
-        <RouterView />
-    </main>
-
+        <main>
+            <RouterView :key="$route.fullPath" />
+        </main>
+    </div>
     <footer>
         <p>�� 2023 My Cryptocurrency App</p>
     </footer>
 </template>
 
 <script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
+import { RouterView } from 'vue-router'
 import { onMounted } from 'vue'
 import { useCurrenciesStore } from './stores/currencies'
+import SiteHeader from './components/SiteHeader.vue'
 
 const currencies = useCurrenciesStore()
 
@@ -30,11 +24,14 @@ onMounted(async () => {
 })
 </script>
 <style scoped>
-header {
-    display: flex;
-    align-items: center;
-    line-height: 1.5;
+#site {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+#header {
     height: 15vh;
+    margin-bottom: 100px;
 }
 
 main {

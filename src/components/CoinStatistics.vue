@@ -1,17 +1,27 @@
 <template>
     <section id="statistics-wrapper">
-        <h2>{{ props.currency.name }} Statistics</h2>
+        <h2>{{ props.currency.symbol ? props.currency.symbol.toUpperCase() : '-' }} Statistics</h2>
         <div class="row">
             <label>Market Cap</label>
-            <b>${{ props.currency.market_cap.toLocaleString() }}</b>
+            <b>{{
+                props.currency.market_cap ? `$${props.currency.market_cap.toLocaleString()}` : '-'
+            }}</b>
         </div>
         <div class="row">
             <label>Fully Diluted Valuation</label>
-            <b>${{ props.currency.fully_diluted_valuation.toLocaleString() }}</b>
+            <b>{{
+                props.currency.fully_diluted_valuation
+                    ? `$${props.currency.fully_diluted_valuation.toLocaleString()}`
+                    : '-'
+            }}</b>
         </div>
         <div class="row">
             <label>24-Hour Trading Volume</label>
-            <b>${{ props.currency.total_volume.toLocaleString() }}</b>
+            <b>{{
+                props.currency.total_volume
+                    ? `$${props.currency.total_volume.toLocaleString()}`
+                    : '-'
+            }}</b>
         </div>
         <div class="row">
             <label>Total Value Locked</label>
@@ -19,11 +29,17 @@
         </div>
         <div class="row">
             <label>Circulating Supply</label>
-            <b>{{ props.currency.circulating_supply.toLocaleString() }}</b>
+            <b>{{
+                props.currency.circulating_supply
+                    ? props.currency.circulating_supply.toLocaleString()
+                    : '-'
+            }}</b>
         </div>
         <div class="row">
             <label>Total Supply</label>
-            <b>{{ props.currency.total_supply.toLocaleString() }}</b>
+            <b>{{
+                props.currency.total_supply ? props.currency.total_supply.toLocaleString() : '-'
+            }}</b>
         </div>
         <div class="row">
             <label>Max Supply</label>

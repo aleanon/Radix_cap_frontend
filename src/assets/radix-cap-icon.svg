@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Background Circle with Radix DLT blue -->
+  <circle cx="32" cy="32" r="30" fill="#05283C" />
+  
+  <!-- Radix gradient background -->
+  <defs>
+    <linearGradient id="radixGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#171753" />
+      <stop offset="100%" stop-color="#05283C" />
+    </linearGradient>
+  </defs>
+  <circle cx="32" cy="32" r="30" fill="url(#radixGradient)" />
+  
+  <!-- C shape -->
+  <path d="M47,21 A20,20 0 1 0 47,43" 
+        stroke="#3DCBFF" 
+        stroke-width="6" 
+        fill="none" 
+        stroke-linecap="round" />
+  
+  <!-- Redesigned square root symbol with clearly defined segments -->
+  <path d="M39,28 L34,28" stroke="#00E186" stroke-width="4" fill="none" stroke-linecap="round" />
+  <path d="M34,28 L29,35" stroke="#00E186" stroke-width="4" fill="none" stroke-linecap="round" />
+  <path d="M29,35 L24,30" stroke="#00E186" stroke-width="4" fill="none" stroke-linecap="round" />
+</svg>

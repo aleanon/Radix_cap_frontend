@@ -1,7 +1,7 @@
 <template>
     <div class="coin-cell">
         <div class="coin-icon">
-            <img :src="props.image" :alt="props.name" width="30" />
+            <img :src="props.image" :alt="props.symbol" width="30" />
         </div>
         <div class="name-ticker-wrapper">
             <div class="coin-name">{{ props.name }}</div>
@@ -35,8 +35,9 @@ const props = defineProps<Props>()
 }
 
 .name-ticker-wrapper {
+    width: 100%;
     display: flex;
-    align-items: center;
+    align-items: start;
     gap: 15px;
     text-align: left;
 }
@@ -48,7 +49,6 @@ const props = defineProps<Props>()
 .ticker {
     font-size: 14px;
     font-weight: 100;
-    width: 100%;
 }
 
 @media (max-width: 1024px) {

@@ -130,7 +130,33 @@ export const useCurrenciesStore = defineStore('currencies', {
             }
             return currencies.sort((a, b) => a.market_cap_rank - b.market_cap_rank)
         },
-        getCurrency(id: string): Currency | null {
+        searchCurrencies(search: string): Currency[] {
+            const currencies = Array.from(this.coins.values()).sort(
+                (a, b) => a.market_cap_rank - b.market_cap_rank,
+            )
+            let matches = 0
+            const result: Currency[] = []
+            for (const currency of currencies) {
+                if (matches >= 30) break
+                if (!isValidCurrency(currency)) continue
+                if (
+                    currency.name.toLowerCase().includes(search.toLowerCase()) ||
+                    currency.symbol.toLowerCase().includes(search.toLowerCase())
+                ) {
+                    result.push(currency)
+                    matches++
+                }
+            }
+            return result
+        },
+        getCurrencyIds(): string[] {
+            const ids: string[] = []
+            for (const id of this.coins.keys()) {
+                ids.push(id)
+            }
+            return ids
+        },
+        getCurrencyById(id: string): Currency | null {
             return this.coins.get(id) ?? null
         },
         async fetchActiveCurrencies() {
@@ -166,5 +192,23 @@ export const useCurrenciesStore = defineStore('currencies', {
                 console.error(`Error fetching cryptocurrencies for page ${activePage}:`, error)
             }
         },
+        async fetchCurrency(coinId: string) {
+            try {
+                const response = await fetch(`http://127.0.0.1:5000/Coin/${coinId}`)
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`)
+                }
+                const data: Currency = await response.json()
+
+                return data
+            } catch (error) {
+                console.error(`Error fetching coin data for ${coinId}:`, error)
+                return null
+            }
+        },
     },
 })
+
+function isValidCurrency(currency: Currency): boolean {
+    return currency.id != null && currency.name != null && currency.symbol != null
+}

@@ -16,17 +16,27 @@ import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
-const currencyId = route.params.coinId as string
+// const currencyId = ref<string>(route.params.coinId as string)
 
 const currencyStore = useCurrenciesStore()
-const currency = computed(() => currencyStore.getCurrency(currencyId))
+const currency = computed(() => {
+    const currencyId = route.params.coinId as string
+    return currencyStore.getCurrencyById(currencyId)
+})
+
+// watch(
+//   () => route.params.id,
+//   (newId) => {
+//     currencyId = newId
+//   }
+// )
 </script>
 
 <style scoped>
 #page-wrapper {
     display: flex;
     justify-self: center;
-    width: 80%;
+    width: 100%;
     flex-direction: column;
     justify-content: start;
     align-items: start;

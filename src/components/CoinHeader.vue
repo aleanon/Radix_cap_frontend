@@ -7,7 +7,7 @@
             <p id="rank">#{{ props.currency.market_cap_rank }}</p>
         </header>
         <div id="price-container">
-            <p id="price">${{ formatPrice(props.currency.current_price) }}</p>
+            <p id="price">{{ formatPrice(props.currency.current_price) }}</p>
             <PercentageChange
                 id="change"
                 :change="props.currency.price_change_percentage_24h"
@@ -26,11 +26,12 @@ interface Props {
 
 const props = defineProps<Props>()
 
-const formatPrice = (price: number): string => {
-    return price.toLocaleString('en-US', {
+const formatPrice = (price: number | null): string => {
+    if (price === null) return '-'
+    return `$${price.toLocaleString('en-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
-    })
+    })}`
 }
 </script>
 

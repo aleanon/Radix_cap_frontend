@@ -4,22 +4,19 @@
         <div class="row">
             <label>24h Range</label>
             <b>
-                <span>$</span>{{ formatPrice(props.currency.low_24h) }} - <span>$</span
-                >{{ formatPrice(props.currency.high_24h) }}
+                {{ formatPrice(props.currency.low_24h) }} -
+                {{ formatPrice(props.currency.high_24h) }}
             </b>
         </div>
         <div class="row">
             <label>7d Range</label>
-            <b
-                ><span>$</span>{{ formatPrice(sevenDayLow) }} - <span>$</span
-                >{{ formatPrice(sevenDayHigh) }}</b
-            >
+            <b>{{ formatPrice(sevenDayLow) }} - {{ formatPrice(sevenDayHigh) }}</b>
         </div>
         <div class="row">
             <label>All-Time High</label>
             <div>
                 <div class="historic-price-percentage">
-                    <b>${{ formatPrice(props.currency.ath) }}</b>
+                    <b>{{ formatPrice(props.currency.ath) }}</b>
                     <PercentageChange
                         :change="props.currency.ath_change_percentage"
                         class="percentage"
@@ -32,7 +29,7 @@
             <label>All-Time Low</label>
             <div>
                 <div class="historic-price-percentage">
-                    <b>${{ formatPrice(props.currency.atl) }}</b>
+                    <b>{{ formatPrice(props.currency.atl) }}</b>
                     <PercentageChange
                         :change="props.currency.atl_change_percentage"
                         class="percentage"
@@ -69,11 +66,12 @@ const sevenDayHigh = computed(() => {
     }, props.currency.current_price)
 })
 
-const formatPrice = (price: number): string => {
-    return price.toLocaleString('en-US', {
+const formatPrice = (price: number | null): string => {
+    if (price === null) return '-'
+    return `$${price.toLocaleString('en-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
-    })
+    })}`
 }
 </script>
 
