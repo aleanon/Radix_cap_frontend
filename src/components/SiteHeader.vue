@@ -11,6 +11,7 @@
         <nav>
             <NavButton :name="'Currencies'"></NavButton>
         </nav>
+        <!-- <OverlayBackdrop @closeSearch="searchOverlay = false"></OverlayBackdrop> -->
         <SearchOverlay @closeSearch="searchOverlay = false" :showSearch="searchOverlay">
         </SearchOverlay>
         <SearchField @openSearch="searchOverlay = true" id="search"> </SearchField>

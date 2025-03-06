@@ -17,10 +17,10 @@ import { onMounted } from 'vue'
 import { useCurrenciesStore } from './stores/currencies'
 import SiteHeader from './components/SiteHeader.vue'
 
-const currencies = useCurrenciesStore()
+const currenciesStore = useCurrenciesStore()
 
 onMounted(async () => {
-    currencies.fetchAllCurrencies()
+    currenciesStore.fetchAllCurrencies()
 })
 </script>
 <style scoped>

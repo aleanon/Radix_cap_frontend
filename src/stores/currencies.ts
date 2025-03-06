@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import { shallowRef, type ShallowRef } from 'vue'
 
 export class Roi {
     times: number
@@ -111,39 +112,43 @@ export class Currency {
 export const useCurrenciesStore = defineStore('currencies', {
     state: () => ({
         active_cryptocurrencies: 0,
-        coins: new Map<string, Currency>(),
+        coins: new Map<string, ShallowRef<Currency, Currency>>(),
     }),
     actions: {
         setCurrencies(currencies: Currency[]): void {
             currencies.forEach((currency) => {
-                this.coins.set(currency.id, currency)
+                this.coins.set(currency.id, shallowRef(currency))
             })
             this.active_cryptocurrencies = this.coins.size
         },
         getCurrencies(start_rank: number, end_rank: number): Currency[] {
             const currencies = []
             for (const currency of this.coins.values()) {
-                if (currency.market_cap_rank < start_rank || currency.market_cap_rank > end_rank)
+                if (
+                    currency.value.market_cap_rank < start_rank ||
+                    currency.value.market_cap_rank > end_rank
+                )
                     continue
 
-                currencies.push(currency)
+                currencies.push(currency.value)
             }
             return currencies.sort((a, b) => a.market_cap_rank - b.market_cap_rank)
         },
         searchCurrencies(search: string): Currency[] {
+            const query = search.toLowerCase()
             const currencies = Array.from(this.coins.values()).sort(
-                (a, b) => a.market_cap_rank - b.market_cap_rank,
+                (a, b) => b.value.market_cap - a.value.market_cap,
             )
             let matches = 0
             const result: Currency[] = []
             for (const currency of currencies) {
                 if (matches >= 30) break
-                if (!isValidCurrency(currency)) continue
+                if (!isValidCurrency(currency.value)) continue
                 if (
-                    currency.name.toLowerCase().includes(search.toLowerCase()) ||
-                    currency.symbol.toLowerCase().includes(search.toLowerCase())
+                    currency.value.name.toLowerCase().includes(query) ||
+                    currency.value.symbol.toLowerCase().includes(query)
                 ) {
-                    result.push(currency)
+                    result.push(currency.value)
                     matches++
                 }
             }
@@ -157,17 +162,17 @@ export const useCurrenciesStore = defineStore('currencies', {
             return ids
         },
         getCurrencyById(id: string): Currency | null {
-            return this.coins.get(id) ?? null
+            return this.coins.get(id)?.value ?? null
         },
-        async fetchActiveCurrencies() {
-            try {
-                const response = await fetch('https://api.coingecko.com/api/v3/global')
-                const data = await response.json()
-                this.active_cryptocurrencies = data.data.active_cryptocurrencies
-            } catch (err) {
-                console.error('Error fetching active cryptocurrencies', err)
-            }
-        },
+        // async fetchActiveCurrencies() {
+        //     try {
+        //         const response = await fetch('https://api.coingecko.com/api/v3/global')
+        //         const data = await response.json()
+        //         this.active_cryptocurrencies = data.data.active_cryptocurrencies
+        //     } catch (err) {
+        //         console.error('Error fetching active cryptocurrencies', err)
+        //     }
+        // },
         async fetchAllCurrencies() {
             try {
                 const response = await fetch('http://127.0.0.1:5000/AllCoins')

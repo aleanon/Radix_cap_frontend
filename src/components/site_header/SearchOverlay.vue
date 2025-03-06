@@ -1,30 +1,25 @@
 <template>
-    <div id="see-through" v-show="props.showSearch" @click="closeOverlay()">
-        <div id="container">
-            <section id="searchbar">
-                <input ref="searchInput" v-model="searchQuery" placeholder="Search..." />
-                <button @click="closeOverlay()">
-                    <font-awesome-icon :icon="'xmark'" />
-                </button>
-            </section>
-            <div id="list">
-                <ul>
-                    <SearchItem
-                        v-for="(item, index) in filteredItems"
-                        :currency="item"
-                        :key="index"
-                    >
-                        {{ item }}
-                    </SearchItem>
-                </ul>
-            </div>
-        </div>
+    <!-- <div id="overlay-backdrop" v-show="props.showSearch" @click="closeOverlay()"></div> -->
+    <div id="container" v-show="props.showSearch">
+        <section id="searchbar">
+            <input ref="searchInput" v-model="searchQuery" placeholder="Search..." />
+            <button @click="closeOverlay()">
+                <font-awesome-icon :icon="'xmark'" />
+            </button>
+        </section>
+        <section id="list">
+            <ul>
+                <SearchItem v-for="(item, index) in filteredItems" :currency="item" :key="index">
+                    {{ item }}
+                </SearchItem>
+            </ul>
+        </section>
     </div>
 </template>
 
 <script setup lang="ts">
 import { useCurrenciesStore } from '@/stores/currencies'
-import { ref, computed, nextTick, watch } from 'vue'
+import { ref, computed, nextTick, watch, onMounted, onBeforeUnmount } from 'vue'
 import SearchItem from './SearchItem.vue'
 import router from '@/router'
 
@@ -63,18 +58,35 @@ watch(
         }
     },
 )
+
+const handleClickOutside = (event: MouseEvent) => {
+    const overlayContent = document.querySelector('.overlay-content')
+    if (overlayContent && !overlayContent.contains(event.target as Node)) {
+        closeOverlay()
+    }
+}
+
+onMounted(() => {
+    if (props.showSearch) {
+        document.addEventListener('click', handleClickOutside)
+    }
+})
+
+onBeforeUnmount(() => {
+    document.removeEventListener('click', handleClickOutside)
+})
 </script>
 
 <style scoped>
-#see-through {
-    position: absolute;
+/* #overlay-backdrop {
+    position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.7);
+    background-color: rgba(0, 0, 0, 0);
     z-index: 999;
-}
+} */
 
 #container {
     display: flex;
